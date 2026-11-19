@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Rate Rental')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<style>
+    /* 5 clickable stars. They are written 5 to 1 and shown in reverse, so "all stars before the chosen one" works in CSS. */
+    .star-rating { display: inline-flex; flex-direction: row-reverse; justify-content: flex-end; gap: 4px; }
+    .star-rating input { display: none; }
+    .star-rating label { font-size: 2.6rem; line-height: 1; color: #d0d0d0; cursor: pointer; transition: color .15s; }
+    .star-rating input:checked ~ label,
+    .star-rating label:hover,
+    .star-rating label:hover ~ label { color: #f5a623; }
+</style>
+
+<main class="container py-4" style="max-width: 720px;">
+    <a class="btn btn-link ps-0 mb-2" th:href="@{/customer/bookings/{id}(id=${booking.bookingId})}">&larr; Back to booking</a>
+    <h2 class="mb-3">Rate your rental</h2>
+
+    <div class="alert alert-success" th:if="${success}" th:text="${success}">Done</div>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}">Error</div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-1" th:text="${booking.car.brand + ' ' + booking.car.model}">Brand Model</h5>
+            <p class="text-muted small mb-0"
+               th:text="'Booking #' + ${booking.bookingId} + ' | ' + ${#strings.replace(booking.pickupDateTime, 'T', ' ')} + ' to ' + ${#strings.replace(booking.returnDateTime, 'T', ' ')}">
+                Booking</p>
+        </div>
+    </div>
+
+    <!-- Already reviewed: show the review -->
+    <div class="card shadow-sm" th:if="${review != null}">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Your review</h5>
+            <div class="d-flex align-items-center mb-2">
+                <div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center me-3"
+                     style="width:44px;height:44px;"
+                     th:text="${#strings.toUpperCase(#strings.substring(review.customer.user.userName, 0, 1))}">A</div>
+                <div>
+                    <div class="fw-semibold" th:text="${review.customer.user.userName}">Name</div>
+                    <span class="fs-5" th:replace="~{fragments/stars :: stars(${review.rating})}">★★★★★</span>
+                    <span class="text-muted small ms-2" th:text="${review.reviewDate}">2026-11-18</span>
+                </div>
+            </div>
+            <p class="mb-0" th:if="${review.comment != null}" th:text="${review.comment}">Comment</p>
+        </div>
+    </div>
+
+    <!-- Not reviewed yet: show the form -->
+    <div class="card shadow-sm" th:if="${review == null}">
+        <div class="card-body p-4">
+            <form th:action="@{/customer/bookings/{id}/review(id=${booking.bookingId})}"
+                  th:object="${reviewForm}" method="post" novalidate>
+
+                <div class="mb-3">
+                    <label class="form-label d-block fw-semibold">How was your experience?</label>
+                    <div class="star-rating">
+                        <input type="radio" name="rating" id="star5" value="5" th:checked="${reviewForm.rating == 5}">
+                        <label for="star5" title="Excellent">&#9733;</label>
+                        <input type="radio" name="rating" id="star4" value="4" th:checked="${reviewForm.rating == 4}">
+                        <label for="star4" title="Good">&#9733;</label>
+                        <input type="radio" name="rating" id="star3" value="3" th:checked="${reviewForm.rating == 3}">
+                        <label for="star3" title="Average">&#9733;</label>
+                        <input type="radio" name="rating" id="star2" value="2" th:checked="${reviewForm.rating == 2}">
+                        <label for="star2" title="Poor">&#9733;</label>
+                        <input type="radio" name="rating" id="star1" value="1" th:checked="${reviewForm.rating == 1}">
+                        <label for="star1" title="Very poor">&#9733;</label>
+                    </div>
+                    <div class="text-danger small mt-1" th:if="${#fields.hasErrors('rating')}" th:errors="*{rating}">Error</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="comment" class="form-label fw-semibold">Write your review (optional)</label>
+                    <textarea class="form-control" id="comment" rows="4" th:field="*{comment}"
+                              placeholder="Tell others about the car and your rental experience"
+                              th:classappend="${#fields.hasErrors('comment')} ? 'is-invalid'"></textarea>
+                    <div class="invalid-feedback" th:errors="*{comment}">Error</div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit review</button>
+            </form>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

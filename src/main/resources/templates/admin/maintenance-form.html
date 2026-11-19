@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Add Maintenance')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container py-4" style="max-width: 720px;">
+    <a class="btn btn-link ps-0 mb-2" th:href="@{/admin/maintenance}">&larr; Back to maintenance</a>
+    <h2 class="mb-3">Add Maintenance</h2>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <form th:action="@{/admin/maintenance}" th:object="${maintenanceForm}" method="post" novalidate>
+
+                <div class="alert alert-danger" th:if="${#fields.hasGlobalErrors()}">
+                    <div th:each="err : ${#fields.globalErrors()}" th:text="${err}">Error</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="carId" class="form-label">Car</label>
+                    <select class="form-select" id="carId" th:field="*{carId}"
+                            th:classappend="${#fields.hasErrors('carId')} ? 'is-invalid'">
+                        <option value="">Select car</option>
+                        <option th:each="c : ${cars}" th:value="${c.carId}"
+                                th:text="${c.brand + ' ' + c.model + ' (' + c.registrationNumber + ')'}">Brand Model</option>
+                    </select>
+                    <div class="invalid-feedback" th:errors="*{carId}">Error</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="issues" class="form-label">Issue / work to be done</label>
+                    <textarea class="form-control" id="issues" rows="3" th:field="*{issues}"
+                              placeholder="For example: engine problem, brake pads replacement"
+                              th:classappend="${#fields.hasErrors('issues')} ? 'is-invalid'"></textarea>
+                    <div class="invalid-feedback" th:errors="*{issues}">Error</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="startDateTime" class="form-label">Start date and time</label>
+                        <input type="datetime-local" class="form-control" id="startDateTime"
+                               th:field="*{startDateTime}"
+                               th:classappend="${#fields.hasErrors('startDateTime')} ? 'is-invalid'">
+                        <div class="invalid-feedback" th:errors="*{startDateTime}">Error</div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="endDateTime" class="form-label">Expected end (optional)</label>
+                        <input type="datetime-local" class="form-control" id="endDateTime"
+                               th:field="*{endDateTime}"
+                               th:classappend="${#fields.hasErrors('endDateTime')} ? 'is-invalid'">
+                        <div class="invalid-feedback" th:errors="*{endDateTime}">Error</div>
+                    </div>
+                </div>
+
+                <div class="form-text mb-3">
+                    While a maintenance is ongoing the car cannot be booked for that period. Leave the end empty if you
+                    do not know it yet, and click "Mark completed" on the maintenance page when the car is ready.
+                    A car cannot be put under maintenance for a period in which it has a confirmed booking.
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save maintenance</button>
+                <a class="btn btn-outline-secondary" th:href="@{/admin/maintenance}">Cancel</a>
+            </form>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

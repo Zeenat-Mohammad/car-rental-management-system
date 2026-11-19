@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Car Photos')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container py-4" style="max-width: 1000px;">
+    <a class="btn btn-link ps-0" th:href="@{/admin/cars}">&larr; Back to cars</a>
+    <h2 class="mb-1" th:text="'Photos: ' + ${car.brand + ' ' + car.model}">Photos</h2>
+    <p class="text-muted">The cover photo is set in Edit Car. Add up to <span th:text="${maxPhotos}">8</span> extra photos here (JPG, PNG or WEBP, 5 MB each).</p>
+
+    <div class="alert alert-success" th:if="${success}" th:text="${success}">Done</div>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}">Error</div>
+
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+        <h5>Cover photo</h5>
+        <img th:if="${car.imageUrl != null}" th:src="@{${car.imageUrl}}" class="img-thumbnail" style="max-height:140px;" alt="Cover">
+        <p class="text-muted mb-0" th:if="${car.imageUrl == null}">No cover photo yet. Add one from Edit Car.</p>
+    </div></div>
+
+    <div class="card border-0 shadow-sm mb-4"><div class="card-body">
+        <h5>Add photos</h5>
+        <form th:action="@{/admin/cars/{id}/photos(id=${car.carId})}" method="post" enctype="multipart/form-data"
+              class="d-flex flex-wrap gap-2">
+            <input type="file" name="files" class="form-control" style="max-width:420px;" multiple
+                   accept="image/jpeg,image/png,image/webp" required>
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+        <div class="form-text">Hold Ctrl to select several files at once.</div>
+    </div></div>
+
+    <div class="row g-3">
+        <div class="col-6 col-md-3" th:each="img : ${images}">
+            <div class="card border-0 shadow-sm h-100">
+                <img th:src="@{${img.imageUrl}}" class="card-img-top" style="height:130px;object-fit:cover;" alt="Photo">
+                <div class="card-body p-2">
+                    <form th:action="@{/admin/cars/{id}/photos/{iid}/delete(id=${car.carId}, iid=${img.imageId})}" method="post">
+                        <button class="btn btn-sm btn-outline-danger w-100" type="submit">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <p class="text-muted" th:if="${#lists.isEmpty(images)}">No extra photos yet.</p>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Reviews')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="admin-page py-4">
+    <div class="container admin-container" style="max-width: 1000px;">
+
+        <div class="page-header">
+            <div>
+                <h2 class="page-title">Customer Reviews</h2>
+                <p class="page-subtitle">Read customer feedback and manage submitted reviews.</p>
+            </div>
+        </div>
+
+        <div class="alert alert-success admin-alert"
+             th:if="${success}" th:text="${success}">Done</div>
+        <div class="alert alert-danger admin-alert"
+             th:if="${error}" th:text="${error}">Error</div>
+
+        <div class="filter-panel">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <span class="review-filter-label">Filter customer feedback</span>
+
+                <div class="filter-buttons">
+                    <a class="btn"
+                       th:classappend="${!lowOnly} ? ' active-filter' : ' btn-outline-secondary'"
+                       th:href="@{/admin/reviews}">All Reviews</a>
+
+                    <a class="btn"
+                       th:classappend="${lowOnly} ? ' active-filter' : ' btn-outline-secondary'"
+                       th:href="@{/admin/reviews(filter='low')}">Low Rated (Below 3 Stars)</a>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(reviews)}" class="table-panel empty-state">
+            <div class="fw-semibold mb-1">No reviews found</div>
+            <div class="small">Customer reviews will appear here when submitted.</div>
+        </div>
+
+        <div th:each="r : ${reviews}" class="review-list-card">
+            <div class="d-flex justify-content-between review-header gap-3">
+
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="review-avatar"
+                         th:text="${#strings.toUpperCase(#strings.substring(r.customer.user.userName, 0, 1))}">
+                        A
+                    </div>
+
+                    <div>
+                        <div class="fw-bold"
+                             style="color: #14243a;"
+                             th:text="${r.customer.user.userName}">Name</div>
+
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <span th:replace="~{fragments/stars :: stars(${r.rating})}">★★★★★</span>
+                            <span class="review-meta" th:text="${r.reviewDate}">2026-11-18</span>
+                        </div>
+                    </div>
+                </div>
+
+                <form th:action="@{/admin/reviews/{id}/delete(id=${r.reviewId})}"
+                      method="post"
+                      onsubmit="return confirm('Delete this review? This cannot be undone.');">
+                    <input type="hidden" name="filter" th:value="${lowOnly} ? 'low' : ''">
+                    <button type="submit" class="btn btn-sm btn-outline-danger action-btn">
+                        Delete Review
+                    </button>
+                </form>
+            </div>
+
+            <p class="review-comment mb-3"
+               th:if="${r.comment != null}"
+               th:text="${r.comment}">Comment</p>
+
+            <p class="review-comment text-muted fst-italic mb-3"
+               th:if="${r.comment == null}">No comment provided.</p>
+
+            <div class="review-meta border-top pt-3">
+                <span th:text="${r.booking.car.brand + ' ' + r.booking.car.model}">Brand Model</span>
+                <span class="mx-1">&middot;</span>
+                <a th:href="@{/admin/bookings/{id}(id=${r.booking.bookingId})}"
+                   th:text="'Booking #' + ${r.booking.bookingId}">Booking #1</a>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

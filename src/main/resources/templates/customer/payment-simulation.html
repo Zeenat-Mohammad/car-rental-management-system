@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Payment')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container py-5" style="max-width: 560px;">
+    <div class="alert alert-warning text-center fw-bold">
+        TEST PAYMENT &ndash; no real money is charged and no card details are collected.
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <h4 class="mb-3">Complete payment</h4>
+
+            <table class="table table-sm mb-4">
+                <tr><td>Booking</td><td class="text-end" th:text="'#' + ${booking.bookingId}">#1</td></tr>
+                <tr><td>Car</td><td class="text-end" th:text="${booking.car.brand + ' ' + booking.car.model}">Car</td></tr>
+                <tr><td>Payment type</td>
+                    <td class="text-end"
+                        th:text="${payment.paymentType.name() == 'ADVANCE'} ? '30% advance' : 'Full rental amount'">Full</td></tr>
+                <tr><td>Method</td>
+                    <td class="text-end" th:text="${#strings.replace(payment.method, '_', ' ')}">UPI</td></tr>
+                <tr><td>Transaction ID</td><td class="text-end" th:text="${payment.transactionId}">SIM-...</td></tr>
+                <tr class="fw-bold">
+                    <td>Amount to pay</td>
+                    <td class="text-end"
+                        th:text="'₹' + ${#numbers.formatDecimal(payment.amount, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                </tr>
+            </table>
+
+            <p class="text-muted small">Choose the result you want to simulate:</p>
+
+            <form th:action="@{/customer/payments/{id}/simulate(id=${payment.paymentId})}" method="post"
+                  class="d-flex gap-2">
+                <button type="submit" name="outcome" value="success" class="btn btn-success flex-fill">
+                    Simulate successful payment</button>
+                <button type="submit" name="outcome" value="fail" class="btn btn-outline-danger flex-fill">
+                    Simulate failed payment</button>
+            </form>
+
+            <a class="btn btn-link mt-3 ps-0" th:href="@{/customer/bookings/{id}(id=${booking.bookingId})}">
+                &larr; Back to booking</a>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

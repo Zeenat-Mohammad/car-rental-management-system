@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Customer Details')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="admin-page py-4">
+    <div class="container admin-container" style="max-width: 1100px;">
+
+        <a class="back-link" th:href="@{/admin/customers}">&larr; Back to customers</a>
+
+        <div class="page-header">
+            <div>
+                <h2 class="page-title" th:text="${customer.user.userName}">Customer</h2>
+                <p class="page-subtitle">Customer profile and rental history.</p>
+            </div>
+            <span class="badge rounded-pill text-bg-primary px-3 py-2">Customer Profile</span>
+        </div>
+
+        <section class="details-panel">
+            <h5 class="section-title">Personal Information</h5>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="detail-label">Full Name</div>
+                    <div class="detail-value" th:text="${customer.user.userName}">Name</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-label">Email Address</div>
+                    <div class="detail-value" th:text="${customer.user.email}">email</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-label">Phone Number</div>
+                    <div class="detail-value" th:text="${customer.phoneNumber}">Phone</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="detail-label">Licence Number</div>
+                    <div class="detail-value" th:text="${customer.licenseNumber}">Licence</div>
+                </div>
+                <div class="col-12">
+                    <div class="detail-label">Address</div>
+                    <div class="detail-value" th:text="${customer.address}">Address</div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h5 class="section-title">Booking History</h5>
+
+            <div class="table-panel">
+                <div class="table-responsive">
+                    <table class="table admin-table align-middle">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Car</th>
+                            <th>Pickup</th>
+                            <th>Return</th>
+                            <th class="text-end">Rental</th>
+                            <th>Status</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(bookings)}">
+                            <td colspan="7" class="empty-state">
+                                This customer has no bookings yet.
+                            </td>
+                        </tr>
+                        <tr th:each="b : ${bookings}">
+                            <td th:text="${b.bookingId}">1</td>
+                            <td class="primary-cell"
+                                th:text="${b.car.brand + ' ' + b.car.model}">Brand Model</td>
+                            <td th:text="${#strings.replace(b.pickupDateTime, 'T', ' ')}">-</td>
+                            <td th:text="${#strings.replace(b.returnDateTime, 'T', ' ')}">-</td>
+                            <td class="text-end fw-semibold"
+                                th:text="'₹' + ${#numbers.formatDecimal(b.totalCost, 1, 'COMMA', 2, 'POINT')}">
+                                ₹0.00
+                            </td>
+                            <td>
+                                <span class="status-badge"
+                                      th:classappend="${b.status.name() == 'CONFIRMED'} ? ' status-confirmed' : (${b.status.name() == 'PENDING'} ? ' status-pending' : (${b.status.name() == 'COMPLETED'} ? ' status-default' : ' status-cancelled'))"
+                                      th:text="${b.status}">PENDING</span>
+                            </td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-primary action-btn"
+                                   th:href="@{/admin/bookings/{id}(id=${b.bookingId})}">
+                                    View Details
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

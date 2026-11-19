@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('My Bookings')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="admin-page py-4"
+      th:with="active=${bookings.?[status.name() == 'PENDING' or status.name() == 'CONFIRMED']}">
+
+    <div class="container-fluid admin-container px-3 px-md-4">
+
+        <div class="page-header">
+            <div>
+                <h2 class="page-title">My Bookings</h2>
+                <p class="page-subtitle">
+                    View and manage your pending and confirmed car reservations.
+                </p>
+            </div>
+
+            <a class="btn btn-outline-primary px-4 py-2"
+               th:href="@{/customer/bookings/history}">
+                Booking History
+            </a>
+        </div>
+
+        <div class="alert alert-success admin-alert"
+             th:if="${success}" th:text="${success}">Done</div>
+        <div class="alert alert-danger admin-alert"
+             th:if="${error}" th:text="${error}">Error</div>
+
+        <div class="table-panel">
+            <div class="table-responsive">
+                <table class="table admin-table align-middle">
+                    <thead>
+                    <tr>
+                        <th>Booking</th>
+                        <th>Car</th>
+                        <th>Pickup</th>
+                        <th>Return</th>
+                        <th>Days</th>
+                        <th class="text-end">Rental Amount</th>
+                        <th>Status</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(active)}">
+                        <td colspan="8" class="empty-state">
+                            <div class="fw-semibold mb-2">No active bookings</div>
+                            <a th:href="@{/cars}" class="btn btn-sm btn-primary">
+                                Browse Available Cars
+                            </a>
+                        </td>
+                    </tr>
+
+                    <tr th:each="b : ${active}">
+                        <td class="primary-cell" th:text="'#' + ${b.bookingId}">#1</td>
+
+                        <td class="primary-cell"
+                            th:text="${b.car.brand + ' ' + b.car.model}">
+                            Brand Model
+                        </td>
+
+                        <td th:text="${#strings.replace(b.pickupDateTime, 'T', ' ')}">
+                            2026-11-17 10:00
+                        </td>
+
+                        <td th:text="${#strings.replace(b.returnDateTime, 'T', ' ')}">
+                            2026-11-18 10:00
+                        </td>
+
+                        <td th:text="${b.totalDays}">1</td>
+
+                        <td class="text-end fw-semibold"
+                            th:text="'₹' + ${#numbers.formatDecimal(b.totalCost, 1, 'COMMA', 2, 'POINT')}">
+                            ₹0.00
+                        </td>
+
+                        <td>
+                            <span class="booking-status"
+                                  th:classappend="${b.status.name() == 'CONFIRMED'} ? ' booking-status-confirmed' : ' booking-status-pending'"
+                                  th:text="${b.status}">PENDING</span>
+                        </td>
+
+                        <td class="text-end text-nowrap">
+                            <a class="btn btn-sm btn-warning action-btn booking-action"
+                               th:if="${b.status.name() == 'PENDING'}"
+                               th:href="@{/customer/bookings/{id}(id=${b.bookingId})}">
+                                Pay Now
+                            </a>
+
+                            <a class="btn btn-sm btn-outline-primary action-btn booking-action"
+                               th:if="${b.status.name() == 'CONFIRMED'}"
+                               th:href="@{/customer/bookings/{id}(id=${b.bookingId})}">
+                                View Details
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

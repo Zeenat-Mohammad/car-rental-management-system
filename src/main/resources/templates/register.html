@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Register')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container auth-page">
+    <div class="row justify-content-center w-100">
+        <div class="col-lg-10 col-xl-9">
+            <div class="card auth-card overflow-hidden">
+                <div class="row g-0">
+
+                    <!-- Left information panel -->
+                    <div class="col-md-4 auth-side text-white d-none d-md-flex flex-column justify-content-center p-5">
+                        <h2 class="fw-bold mb-3">Join us</h2>
+                        <p class="mb-4">
+                            Create a free account and book your first car in minutes.
+                        </p>
+
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle me-2"></i>Search cars by price
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle me-2"></i>Book for your dates
+                            </li>
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle me-2"></i>Track every booking
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Registration form -->
+                    <div class="col-md-8 auth-form-panel">
+                        <div class="card-body">
+
+                            <h3 class="mb-4">Create your account</h3>
+
+                            <form th:action="@{/register}"
+                                  th:object="${registrationForm}"
+                                  method="post" novalidate>
+
+                                <div class="alert alert-danger"
+                                     th:if="${#fields.hasGlobalErrors()}">
+                                    <div th:each="err : ${#fields.globalErrors()}"
+                                         th:text="${err}">
+                                        Error
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="userName" class="form-label">Full name</label>
+                                    <input type="text" class="form-control"
+                                           id="userName" th:field="*{userName}"
+                                           th:classappend="${#fields.hasErrors('userName')} ? 'is-invalid'">
+
+                                    <div class="invalid-feedback"
+                                         th:errors="*{userName}">Error</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control"
+                                           id="email" th:field="*{email}"
+                                           th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'">
+
+                                    <div class="invalid-feedback"
+                                         th:errors="*{email}">Error</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="password" class="form-label">Password</label>
+                                        <input type="password" class="form-control"
+                                               id="password" th:field="*{password}"
+                                               th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'">
+
+                                        <div class="invalid-feedback"
+                                             th:errors="*{password}">Error</div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="confirmPassword" class="form-label">Confirm password</label>
+                                        <input type="password" class="form-control"
+                                               id="confirmPassword" th:field="*{confirmPassword}"
+                                               th:classappend="${#fields.hasErrors('confirmPassword')} ? 'is-invalid'">
+
+                                        <div class="invalid-feedback"
+                                             th:errors="*{confirmPassword}">Error</div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="phoneNumber" class="form-label">Phone number</label>
+                                        <input type="text" class="form-control"
+                                               id="phoneNumber" th:field="*{phoneNumber}"
+                                               th:classappend="${#fields.hasErrors('phoneNumber')} ? 'is-invalid'">
+
+                                        <div class="invalid-feedback"
+                                             th:errors="*{phoneNumber}">Error</div>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="licenseNumber" class="form-label">Driving license number</label>
+                                        <input type="text" class="form-control"
+                                               id="licenseNumber" th:field="*{licenseNumber}"
+                                               th:classappend="${#fields.hasErrors('licenseNumber')} ? 'is-invalid'">
+
+                                        <div class="invalid-feedback"
+                                             th:errors="*{licenseNumber}">Error</div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="address" class="form-label">Address</label>
+                                    <input type="text" class="form-control"
+                                           id="address" th:field="*{address}"
+                                           th:classappend="${#fields.hasErrors('address')} ? 'is-invalid'">
+
+                                    <div class="invalid-feedback"
+                                         th:errors="*{address}">Error</div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    Register
+                                </button>
+
+                            </form>
+
+                            <p class="auth-switch text-center mt-4 mb-0">
+                                Already registered?
+                                <a th:href="@{/login}">Login</a>
+                            </p>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+</body>
+</html>

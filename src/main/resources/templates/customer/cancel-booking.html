@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Cancel Booking')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container py-4" style="max-width: 720px;">
+    <a class="btn btn-link ps-0 mb-2" th:href="@{/customer/bookings/{id}(id=${booking.bookingId})}">
+        &larr; Back to booking</a>
+    <h2 class="mb-3" th:text="'Cancel booking #' + ${booking.bookingId}">Cancel booking</h2>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <p class="mb-2">Scheduled pickup:
+                <strong th:text="${#strings.replace(booking.pickupDateTime, 'T', ' ')}">-</strong></p>
+            <p class="mb-3 text-muted" th:text="${quote.ruleText}">Rule</p>
+
+            <table class="table table-sm mb-0">
+                <tr>
+                    <td>Rental amount</td>
+                    <td class="text-end"
+                        th:text="'₹' + ${#numbers.formatDecimal(quote.rentalCost, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                </tr>
+                <tr>
+                    <td th:text="'Cancellation charge (' + ${quote.percent} + '%)'">Cancellation charge</td>
+                    <td class="text-end"
+                        th:text="'₹' + ${#numbers.formatDecimal(quote.calculatedCharge, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                </tr>
+                <tr>
+                    <td>Amount you have paid</td>
+                    <td class="text-end"
+                        th:text="'₹' + ${#numbers.formatDecimal(quote.amountPaid, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                </tr>
+                <tr>
+                    <td>Charge kept from your payment</td>
+                    <td class="text-end"
+                        th:text="'₹' + ${#numbers.formatDecimal(quote.chargeApplied, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                </tr>
+                <tr class="table-light fw-bold">
+                    <td>Refund to you</td>
+                    <td class="text-end"
+                        th:text="'₹' + ${#numbers.formatDecimal(quote.refundAmount, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                </tr>
+            </table>
+            <p class="form-text mb-0 mt-2">
+                Refund = amount paid &minus; cancellation charge. It is never below zero, and nothing extra is collected
+                if the charge is more than you have paid.
+            </p>
+        </div>
+    </div>
+
+    <form th:action="@{/customer/bookings/{id}/cancel(id=${booking.bookingId})}" method="post">
+        <button type="submit" class="btn btn-danger">Confirm cancellation</button>
+        <a class="btn btn-outline-secondary" th:href="@{/customer/bookings/{id}(id=${booking.bookingId})}">
+            Keep my booking</a>
+    </form>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

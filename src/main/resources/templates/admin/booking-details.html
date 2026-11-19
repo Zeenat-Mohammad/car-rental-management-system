@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Booking Details')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="container py-4" style="max-width: 1000px;">
+    <a class="btn btn-link ps-0 mb-2" th:href="@{/admin/bookings}">&larr; Back to bookings</a>
+
+    <div class="alert alert-success" th:if="${success}" th:text="${success}">Done</div>
+    <div class="alert alert-danger" th:if="${error}" th:text="${error}">Error</div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0" th:text="'Booking #' + ${booking.bookingId}">Booking #1</h2>
+        <span class="badge fs-6"
+              th:classappend="${booking.status.name() == 'CONFIRMED'} ? 'bg-success' : (${booking.status.name() == 'PENDING'} ? 'bg-warning text-dark' : (${booking.status.name() == 'COMPLETED'} ? 'bg-primary' : 'bg-secondary'))"
+              th:text="${booking.status}">PENDING</span>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100"><div class="card-body">
+                <h5 class="card-title">Customer</h5>
+                <p class="mb-1"><strong th:text="${booking.customer.user.userName}">Name</strong></p>
+                <p class="mb-1 small" th:text="${booking.customer.user.email}">email</p>
+                <p class="mb-1 small" th:text="'Phone: ' + ${booking.customer.phoneNumber}">Phone</p>
+                <p class="mb-0 small" th:text="'Licence: ' + ${booking.customer.licenseNumber}">Licence</p>
+            </div></div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100"><div class="card-body">
+                <h5 class="card-title">Car</h5>
+                <p class="mb-1"><strong th:text="${booking.car.brand + ' ' + booking.car.model}">Brand Model</strong></p>
+                <p class="mb-0 small" th:text="${booking.car.registrationNumber}">MH12AB1234</p>
+            </div></div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100"><div class="card-body">
+                <h5 class="card-title">Rental period</h5>
+                <p class="mb-1">Pickup: <strong th:text="${#strings.replace(booking.pickupDateTime, 'T', ' ')}">-</strong></p>
+                <p class="mb-1">Return: <strong th:text="${#strings.replace(booking.returnDateTime, 'T', ' ')}">-</strong></p>
+                <p class="mb-0" th:if="${booking.actualReturnDateTime != null}">
+                    Actual return: <strong th:text="${#strings.replace(booking.actualReturnDateTime, 'T', ' ')}">-</strong></p>
+            </div></div>
+        </div>
+    </div>
+
+    <!-- Charges -->
+    <div class="card shadow-sm mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Charges</h5>
+            <table class="table table-sm mb-0">
+                <tr>
+                    <td th:text="'Rental: ' + ${booking.totalDays} + (${booking.totalDays == 1} ? ' day' : ' days') + ' x ₹' + ${#numbers.formatDecimal(ratePerDay, 1, 'COMMA', 2, 'POINT')}">Rental</td>
+                    <td class="text-end fw-bold" th:text="'₹' + ${#numbers.formatDecimal(booking.totalCost, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(charges)}">
+                    <td class="text-muted">Additional charges</td>
+                    <td class="text-end text-muted">None</td>
+                </tr>
+                <tr th:each="charge : ${charges}">
+                    <td th:text="'Additional charge: ' + ${charge.description}">Additional charge</td>
+                    <td class="text-end" th:text="'₹' + ${#numbers.formatDecimal(charge.amount, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                </tr>
+                <tr class="table-light fw-bold">
+                    <td>Total</td>
+                    <td class="text-end" th:text="'₹' + ${#numbers.formatDecimal(grandTotal, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                </tr>
+                <tr th:if="${booking.status.name() == 'CONFIRMED' or booking.status.name() == 'COMPLETED'}">
+                    <td>Received so far</td>
+                    <td class="text-end" th:text="'₹' + ${#numbers.formatDecimal(paidTotal, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                </tr>
+                <tr th:if="${booking.status.name() == 'CONFIRMED' or booking.status.name() == 'COMPLETED'}" class="fw-bold">
+                    <td>Still to be received</td>
+                    <td class="text-end" th:text="'₹' + ${#numbers.formatDecimal(outstanding, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Payments -->
+    <div class="card shadow-sm mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Payments</h5>
+            <p class="text-muted mb-0" th:if="${#lists.isEmpty(payments)}">No payments yet.</p>
+            <div class="table-responsive" th:unless="${#lists.isEmpty(payments)}">
+                <table class="table table-sm align-middle mb-0">
+                    <thead><tr>
+                        <th>Transaction</th><th>Type</th><th>Method</th><th class="text-end">Amount</th><th>Status</th><th></th>
+                    </tr></thead>
+                    <tbody>
+                    <tr th:each="p : ${payments}">
+                        <td class="small" th:text="${p.transactionId}">SIM-...</td>
+                        <td th:text="${#strings.replace(p.paymentType, '_', ' ')}">FULL</td>
+                        <td th:text="${#strings.replace(p.method, '_', ' ')}">CARD</td>
+                        <td class="text-end" th:text="'₹' + ${#numbers.formatDecimal(p.amount, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${p.status.name() == 'SUCCESSFUL'} ? 'bg-success' : (${p.status.name() == 'PENDING'} ? 'bg-warning text-dark' : (${p.status.name() == 'REFUNDED'} ? 'bg-info text-dark' : 'bg-secondary'))"
+                                  th:text="${p.status}">PENDING</span>
+                        </td>
+                        <td class="text-end">
+                            <form th:if="${p.status.name() == 'PENDING' and p.method.name() == 'PAY_AT_PICKUP' and booking.status.name() == 'CONFIRMED'}"
+                                  th:action="@{/admin/bookings/payments/{pid}/received(pid=${p.paymentId})}" method="post"
+                                  onsubmit="return confirm('Confirm that this cash amount was received?');">
+                                <button type="submit" class="btn btn-sm btn-success">Record cash received</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Refunds -->
+    <div class="card shadow-sm mt-4" th:unless="${#lists.isEmpty(refunds)}">
+        <div class="card-body">
+            <h5 class="card-title">Refunds</h5>
+            <table class="table table-sm mb-0">
+                <thead><tr><th>Payment</th><th class="text-end">Refund amount</th><th>Status</th></tr></thead>
+                <tbody>
+                <tr th:each="r : ${refunds}">
+                    <td class="small" th:text="${r.payment.transactionId}">SIM-...</td>
+                    <td class="text-end" th:text="'₹' + ${#numbers.formatDecimal(r.refundAmount, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                    <td th:text="${r.status}">PROCESSED</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Actions for a confirmed booking -->
+    <div class="row g-4 mt-1" th:if="${booking.status.name() == 'CONFIRMED'}">
+        <div class="col-md-7">
+            <div class="card shadow-sm border-primary h-100"><div class="card-body">
+                <h5 class="card-title">Car returned</h5>
+                <p class="text-muted small">
+                    Enter when the customer actually returned the car. A late return is charged after a
+                    2-hour grace period: every started 24 hours counts as one extra day at the booking's daily rate.
+                    This completes the booking and cannot be repeated.
+                </p>
+                <form th:action="@{/admin/bookings/{id}/complete(id=${booking.bookingId})}" method="post"
+                      onsubmit="return confirm('Complete this booking with this return time?');">
+                    <div class="mb-3" style="max-width: 280px;">
+                        <label for="actualReturn" class="form-label">Actual return date and time</label>
+                        <input type="datetime-local" class="form-control" id="actualReturn" name="actualReturn"
+                               th:value="${nowLocal}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Complete booking</button>
+                </form>
+            </div></div>
+        </div>
+        <div class="col-md-5">
+            <div class="card shadow-sm border-danger h-100"><div class="card-body">
+                <h5 class="card-title">Cancel booking</h5>
+                <p class="small mb-1" th:text="'If cancelled now: ' + ${quote.percent} + '% cancellation charge.'">Charge</p>
+                <p class="small mb-1" th:text="'Charge kept: ₹' + ${#numbers.formatDecimal(quote.chargeApplied, 1, 'COMMA', 2, 'POINT')}">Charge</p>
+                <p class="small mb-3" th:text="'Refund: ₹' + ${#numbers.formatDecimal(quote.refundAmount, 1, 'COMMA', 2, 'POINT')}">Refund</p>
+                <form th:action="@{/admin/bookings/{id}/cancel(id=${booking.bookingId})}" method="post"
+                      onsubmit="return confirm('Cancel this booking?');">
+                    <button type="submit" class="btn btn-outline-danger">Cancel booking</button>
+                </form>
+            </div></div>
+        </div>
+    </div>
+
+    <div class="mt-4" th:if="${booking.status.name() == 'PENDING'}">
+        <form th:action="@{/admin/bookings/{id}/cancel(id=${booking.bookingId})}" method="post"
+              onsubmit="return confirm('Cancel this pending booking?');">
+            <button type="submit" class="btn btn-outline-danger">Cancel pending booking</button>
+        </form>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

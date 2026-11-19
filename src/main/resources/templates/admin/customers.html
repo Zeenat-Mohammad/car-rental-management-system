@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Customers')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="admin-page py-4">
+    <div class="container-fluid admin-container px-3 px-md-4">
+
+        <div class="page-header">
+            <div>
+                <h2 class="page-title">Manage Customers</h2>
+                <p class="page-subtitle">View registered customers and their rental activity.</p>
+            </div>
+        </div>
+
+        <div class="alert alert-danger admin-alert" th:if="${error}" th:text="${error}">Error</div>
+
+        <div class="filter-panel search-panel">
+            <form class="row g-2 align-items-center"
+                  th:action="@{/admin/customers}" method="get">
+                <div class="col-12 col-md-7 col-lg-6">
+                    <input type="text" class="form-control" name="keyword"
+                           th:value="${keyword}"
+                           placeholder="Search by name, email, phone or licence number">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary px-4">Search</button>
+                    <a class="btn btn-outline-secondary" th:href="@{/admin/customers}">Clear</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-panel">
+            <div class="table-responsive">
+                <table class="table admin-table align-middle">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Licence</th>
+                        <th class="text-center">Bookings</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(rows)}">
+                        <td colspan="7" class="empty-state">No customers found.</td>
+                    </tr>
+                    <tr th:each="r : ${rows}">
+                        <td th:text="${r.customer.customerId}">1</td>
+                        <td class="primary-cell" th:text="${r.customer.user.userName}">Name</td>
+                        <td th:text="${r.customer.user.email}">email</td>
+                        <td th:text="${r.customer.phoneNumber}">Phone</td>
+                        <td th:text="${r.customer.licenseNumber}">Licence</td>
+                        <td class="text-center">
+                            <span class="badge rounded-pill text-bg-light border px-3 py-2"
+                                  th:text="${r.bookingCount}">0</span>
+                        </td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-primary action-btn"
+                               th:href="@{/admin/customers/{id}(id=${r.customer.customerId})}">
+                                View Details
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

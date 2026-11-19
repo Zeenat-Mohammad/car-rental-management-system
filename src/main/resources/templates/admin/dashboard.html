@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Admin Dashboard')}"></head>
+
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<style>
+    :root {
+        --admin-navy: #14243a;
+        --admin-blue: #2563eb;
+        --admin-bg: #f4f6fa;
+        --admin-muted: #718096;
+    }
+
+    body {
+        background: var(--admin-bg);
+        color: #263449;
+    }
+
+    .dashboard-wrapper {
+        max-width: 1400px;
+    }
+
+    .welcome-panel {
+        background: linear-gradient(120deg, #14243a, #243f60);
+        color: white;
+        border-radius: 18px;
+        padding: 32px;
+        margin-bottom: 28px;
+        box-shadow: 0 10px 25px rgba(20, 36, 58, 0.14);
+    }
+
+    .welcome-panel h2 {
+        font-weight: 750;
+        letter-spacing: -0.5px;
+    }
+
+    .welcome-panel p {
+        color: #d1dbea;
+    }
+
+    .admin-badge {
+        display: inline-block;
+        background: rgba(255,255,255,0.14);
+        color: white;
+        padding: 7px 14px;
+        border-radius: 30px;
+        font-size: 13px;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .section-heading {
+        font-weight: 700;
+        color: var(--admin-navy);
+        margin-bottom: 17px;
+    }
+
+    .stat-card {
+        background: white;
+        border: 1px solid #e9edf3;
+        border-radius: 15px;
+        padding: 22px;
+        height: 100%;
+        box-shadow: 0 4px 14px rgba(30, 50, 80, 0.04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 22px rgba(30, 50, 80, 0.09);
+    }
+
+    .stat-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 18px;
+    }
+
+    .stat-label {
+        color: var(--admin-muted);
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+    }
+
+    .stat-icon {
+        width: 43px;
+        height: 43px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 21px;
+        font-weight: 700;
+    }
+
+    .icon-blue { background: #e8f0ff; color: #2563eb; }
+    .icon-green { background: #e5f7ee; color: #15945b; }
+    .icon-purple { background: #f0eaff; color: #7950c7; }
+    .icon-orange { background: #fff1df; color: #d97706; }
+
+    .stat-value {
+        color: var(--admin-navy);
+        font-size: 30px;
+        font-weight: 750;
+        line-height: 1.2;
+        overflow-wrap: anywhere;
+    }
+
+    .dashboard-panel {
+        background: white;
+        border: 1px solid #e9edf3;
+        border-radius: 15px;
+        box-shadow: 0 4px 14px rgba(30, 50, 80, 0.04);
+        overflow: hidden;
+    }
+
+    .panel-heading {
+        padding: 20px 23px;
+        border-bottom: 1px solid #edf0f4;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .panel-heading h5 {
+        font-weight: 700;
+        color: var(--admin-navy);
+        margin: 0;
+    }
+
+    .payment-table {
+        margin-bottom: 0;
+    }
+
+    .payment-table th {
+        background: #f7f9fc;
+        color: #66758a;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 15px 22px;
+        border-bottom: 1px solid #edf0f4;
+    }
+
+    .payment-table td {
+        padding: 15px 22px;
+        color: #39485d;
+    }
+
+    .payment-table tfoot td {
+        background: #f7f9fc;
+        color: var(--admin-navy);
+        font-weight: 750;
+        border-top: 1px solid #e9edf3;
+    }
+
+    .review-card {
+        background: white;
+        border: 1px solid #e9edf3;
+        border-radius: 14px;
+        padding: 19px;
+        height: 100%;
+        box-shadow: 0 4px 12px rgba(30, 50, 80, 0.035);
+        transition: transform 0.2s ease;
+    }
+
+    .review-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .customer-avatar {
+        width: 42px;
+        height: 42px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: #e8efff;
+        color: #2857a5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 750;
+    }
+
+    .review-comment {
+        color: #69778b;
+        font-size: 14px;
+        line-height: 1.6;
+        margin-top: 14px;
+    }
+
+    .management-card {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        background: white;
+        border: 1px solid #e9edf3;
+        border-radius: 15px;
+        padding: 23px;
+        height: 100%;
+        box-shadow: 0 4px 14px rgba(30, 50, 80, 0.04);
+        transition: transform 0.2s ease, box-shadow 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .management-card:hover {
+        color: inherit;
+        transform: translateY(-4px);
+        border-color: #b8cdf7;
+        box-shadow: 0 10px 22px rgba(30, 50, 80, 0.09);
+    }
+
+    .management-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 13px;
+        background: #edf3ff;
+        color: #2563eb;
+        font-size: 23px;
+        margin-bottom: 17px;
+    }
+
+    .management-card h5 {
+        font-weight: 700;
+        color: var(--admin-navy);
+        margin-bottom: 8px;
+    }
+
+    .management-card p {
+        color: var(--admin-muted);
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 17px;
+    }
+
+    .management-link {
+        color: var(--admin-blue);
+        font-weight: 700;
+        font-size: 14px;
+    }
+
+    .view-all-link {
+        color: var(--admin-blue);
+        text-decoration: none;
+        font-weight: 650;
+        font-size: 14px;
+    }
+
+    .view-all-link:hover {
+        text-decoration: underline;
+    }
+
+    .empty-state {
+        padding: 28px 15px;
+        text-align: center;
+        color: var(--admin-muted);
+    }
+
+    @media (max-width: 576px) {
+        .welcome-panel {
+            padding: 24px 20px;
+        }
+
+        .stat-card {
+            padding: 17px;
+        }
+
+        .stat-value {
+            font-size: 25px;
+        }
+
+        .panel-heading {
+            padding: 17px;
+        }
+
+        .payment-table th,
+        .payment-table td {
+            padding: 12px 14px;
+        }
+    }
+</style>
+
+<main class="container-fluid dashboard-wrapper py-4 px-3 px-md-4">
+
+    <!-- Welcome section -->
+    <section class="welcome-panel">
+        <div class="d-flex flex-column flex-md-row
+                    justify-content-between align-items-md-center gap-3">
+            <div>
+                <span class="admin-badge mb-3">ADMINISTRATOR</span>
+                <h2 class="mb-2">Admin Dashboard</h2>
+                <p class="mb-0">
+                    Welcome back,
+                    <strong th:text="${displayName}">Admin</strong>.
+                    Manage your fleet, customers and bookings from here.
+                </p>
+            </div>
+            <div class="text-md-end">
+                <div class="small text-white-50">CONTROL PANEL</div>
+                <div class="fw-semibold">Car Rental Management</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics -->
+    <section class="mb-4">
+        <h5 class="section-heading">Overview</h5>
+
+        <div class="row g-3">
+            <div class="col-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">Total Cars</span>
+                        <div class="stat-icon icon-blue">C</div>
+                    </div>
+                    <div class="stat-value" th:text="${stats.totalCars}">0</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">Customers</span>
+                        <div class="stat-icon icon-green">U</div>
+                    </div>
+                    <div class="stat-value" th:text="${stats.totalCustomers}">0</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">Total Bookings</span>
+                        <div class="stat-icon icon-purple">B</div>
+                    </div>
+                    <div class="stat-value"
+                         th:text="${stats.pendingBookings + stats.confirmedBookings + stats.completedBookings + stats.cancelledBookings}">0</div>
+                </div>
+            </div>
+
+            <div class="col-6 col-xl-3">
+                <div class="stat-card">
+                    <div class="stat-top">
+                        <span class="stat-label">Revenue</span>
+                        <div class="stat-icon icon-orange">₹</div>
+                    </div>
+                    <div class="stat-value"
+                         th:text="'₹' + ${#numbers.formatDecimal(stats.paymentsReceived, 1, 'COMMA', 0, 'POINT')}">₹0</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pending payments -->
+    <section class="dashboard-panel mb-4">
+        <div class="panel-heading">
+            <div>
+                <h5>Pending Payments</h5>
+                <small class="text-muted">Payments awaiting collection</small>
+            </div>
+            <span class="badge text-bg-warning">Pending</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table payment-table align-middle">
+                <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th class="text-end">Payment Amount</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:if="${#lists.isEmpty(stats.pendingPayments)}">
+                    <td colspan="2" class="empty-state">
+                        No pending payments at the moment.
+                    </td>
+                </tr>
+
+                <tr th:each="p : ${stats.pendingPayments}">
+                    <td>
+                        <span class="fw-semibold" th:text="${p.customerName}">Name</span>
+                    </td>
+                    <td class="text-end fw-semibold"
+                        th:text="'₹' + ${#numbers.formatDecimal(p.amount, 1, 'COMMA', 2, 'POINT')}">
+                        ₹0.00
+                    </td>
+                </tr>
+                </tbody>
+
+                <tfoot>
+                <tr>
+                    <td>Total Due</td>
+                    <td class="text-end"
+                        th:text="'₹' + ${#numbers.formatDecimal(stats.cashDueAtPickup, 1, 'COMMA', 2, 'POINT')}">
+                        ₹0.00
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </section>
+
+    <!-- Low-rated reviews -->
+    <section class="mb-5">
+        <div class="d-flex flex-wrap justify-content-between
+                    align-items-center gap-2 mb-3">
+            <div>
+                <h5 class="section-heading mb-1">Customer Feedback</h5>
+                <small class="text-muted">Reviews with ratings below 3 stars</small>
+            </div>
+
+            <a th:if="${lowReviewCount > #lists.size(lowReviews)}"
+               th:href="@{/admin/reviews(filter='low')}"
+               class="view-all-link"
+               th:text="'View all ' + ${lowReviewCount} + ' →'">
+                View all →
+            </a>
+        </div>
+
+        <p class="text-muted bg-white rounded-3 p-4 border"
+           th:if="${#lists.isEmpty(lowReviews)}">
+            No low-rated reviews. Great work!
+        </p>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3"
+             th:if="${!#lists.isEmpty(lowReviews)}">
+
+            <div class="col" th:each="r : ${lowReviews}">
+                <div class="review-card">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="customer-avatar"
+                             th:text="${#strings.toUpperCase(#strings.substring(r.customer.user.userName, 0, 1))}">
+                            A
+                        </div>
+
+                        <div>
+                            <div class="fw-bold"
+                                 th:text="${r.customer.user.userName}">
+                                Customer Name
+                            </div>
+                            <span th:replace="~{fragments/stars :: stars(${r.rating})}">
+                                ★★★★★
+                            </span>
+                        </div>
+                    </div>
+
+                    <p class="review-comment mb-0"
+                       th:if="${r.comment != null}"
+                       th:text="${#strings.abbreviate(r.comment, 120)}">
+                        Review comment
+                    </p>
+
+                    <p class="review-comment fst-italic mb-0"
+                       th:if="${r.comment == null}">
+                        No comment provided.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Management shortcuts -->
+    <section class="mb-4">
+        <div class="mb-3">
+            <h5 class="section-heading mb-1">Management Center</h5>
+            <small class="text-muted">Quick access to your administration tools</small>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+
+            <div class="col">
+                <a class="management-card" th:href="@{/admin/cars}">
+                    <div class="management-icon">C</div>
+                    <h5>Manage Cars</h5>
+                    <p>Add new vehicles, update car details, remove cars and control availability.</p>
+                    <span class="management-link">Open Car Management →</span>
+                </a>
+            </div>
+
+            <div class="col">
+                <a class="management-card" th:href="@{/admin/bookings}">
+                    <div class="management-icon">B</div>
+                    <h5>Manage Bookings</h5>
+                    <p>Review reservations, record payments, process cancellations and complete returns.</p>
+                    <span class="management-link">Open Bookings →</span>
+                </a>
+            </div>
+
+            <div class="col">
+                <a class="management-card" th:href="@{/admin/maintenance}">
+                    <div class="management-icon">M</div>
+                    <h5>Maintenance</h5>
+                    <p>Track vehicle repairs and servicing and manage maintenance records.</p>
+                    <span class="management-link">Open Maintenance →</span>
+                </a>
+            </div>
+
+            <div class="col">
+                <a class="management-card" th:href="@{/admin/customers}">
+                    <div class="management-icon">U</div>
+                    <h5>Manage Customers</h5>
+                    <p>Search registered customers and review their booking history.</p>
+                    <span class="management-link">Open Customers →</span>
+                </a>
+            </div>
+
+            <div class="col">
+                <a class="management-card" th:href="@{/admin/reviews}">
+                    <div class="management-icon">★</div>
+                    <h5>Manage Reviews</h5>
+                    <p>View customer ratings, read feedback and manage inappropriate reviews.</p>
+                    <span class="management-link">Open Reviews →</span>
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

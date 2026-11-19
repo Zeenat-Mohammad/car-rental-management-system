@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Manage Cars')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="admin-page">
+    <div class="container admin-container py-4">
+
+        <!-- Page heading -->
+        <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h2 class="page-title">Manage Cars</h2>
+                <p class="page-subtitle">
+                    View, add, update and manage your rental car fleet.
+                </p>
+            </div>
+
+            <a class="btn btn-primary" th:href="@{/admin/cars/new}">
+                <i class="bi bi-plus-lg me-1"></i> Add Car
+            </a>
+        </div>
+
+        <!-- Alerts -->
+        <div class="alert alert-success car-alert"
+             th:if="${success}" th:text="${success}">
+            Done
+        </div>
+
+        <div class="alert alert-danger car-alert"
+             th:if="${error}" th:text="${error}">
+            Error
+        </div>
+
+        <!-- Cars table -->
+        <div class="table-panel">
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <div>
+                    <h5 class="section-title mb-1">Car Inventory</h5>
+                    <p class="page-subtitle mb-0">
+                        All cars registered in your rental system.
+                    </p>
+                </div>
+
+                <span class="badge bg-light text-dark border"
+                      th:text="${#lists.size(cars)} + ' cars'">
+                    0 cars
+                </span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table admin-table align-middle">
+
+                    <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Car</th>
+                        <th>Registration</th>
+                        <th>Category</th>
+                        <th>Fuel / Gear</th>
+                        <th>Seats</th>
+                        <th>Rate / Day</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+
+                    <!-- Empty state -->
+                    <tr th:if="${#lists.isEmpty(cars)}">
+                        <td colspan="9" class="car-empty-state">
+                            <strong>No cars added yet</strong>
+                            Click the Add Car button to create your first car.
+                        </td>
+                    </tr>
+
+                    <!-- Car records -->
+                    <tr th:each="car : ${cars}">
+
+                        <td>
+                            <img th:if="${car.imageUrl != null}"
+                                 th:src="@{${car.imageUrl}}"
+                                 class="car-thumb"
+                                 alt="Car">
+
+                            <span th:if="${car.imageUrl == null}"
+                                  class="car-no-image">
+                                No image
+                            </span>
+                        </td>
+
+                        <td>
+                            <div class="car-name"
+                                 th:text="${car.brand} + ' ' + ${car.model}">
+                                Brand Model
+                            </div>
+
+                            <div class="car-description"
+                                 th:text="${car.color} + ', ' + ${car.manufactureYear}">
+                                Color, Year
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="car-registration"
+                                  th:text="${car.registrationNumber}">
+                                MH12AB1234
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="car-category"
+                                  th:text="${car.category}">
+                                SUV
+                            </span>
+                        </td>
+
+                        <td class="text-nowrap"
+                            th:text="${#strings.capitalize(#strings.toLowerCase(car.fuelType))} + ' / ' + ${#strings.capitalize(#strings.toLowerCase(car.transmission))}">
+                            Petrol / Manual
+                        </td>
+
+                        <td th:text="${car.totalSeat}">5</td>
+
+                        <td>
+                            <span class="car-price"
+                                  th:text="'₹' + ${#numbers.formatDecimal(car.rate, 1, 'COMMA', 2, 'POINT')}">
+                                ₹0.00
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="car-status"
+                                  th:classappend="${car.status.name() == 'AVAILABLE'} ? 'car-status-available' : 'car-status-unavailable'"
+                                  th:text="${#strings.replace(car.status, '_', ' ')}">
+                                AVAILABLE
+                            </span>
+                        </td>
+                        <td class="text-end car-actions">
+                            <a class="btn btn-sm btn-outline-primary"
+                               th:href="@{/admin/cars/{id}/edit(id=${car.carId})}">
+                                <i class="bi bi-pencil-square me-1"></i>Edit
+                            </a>
+
+                            <!-- Added Photos button here -->
+                            <a class="btn btn-sm btn-outline-secondary"
+                               th:href="@{/admin/cars/{id}/photos(id=${car.carId})}">
+                                <i class="bi bi-images me-1"></i>Photos
+                            </a>
+
+                            <form th:action="@{/admin/cars/{id}/delete(id=${car.carId})}"
+                                  method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete this car? This cannot be undone.');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash me-1"></i>Delete
+                                </button>
+                            </form>
+                        </td>
+
+
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+</body>
+</html>

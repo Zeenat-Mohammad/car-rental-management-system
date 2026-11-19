@@ -1,0 +1,308 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Home')}"></head>
+<body>
+
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="home-page">
+
+    <!-- Hero -->
+    <section class="hero hero-home text-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold">Rent the right car, on your dates</h1>
+                    <p class="lead mb-4">
+                        Search available cars, see the full price and book in a few clicks.
+                        Pay online or at pickup.
+                    </p>
+
+                    <div th:if="${loggedIn != true}">
+                        <a class="btn btn-warning btn-lg me-2" th:href="@{/register}">Create account</a>
+                        <a class="btn btn-outline-light btn-lg" th:href="@{/login}">Login</a>
+                    </div>
+
+                    <div th:if="${loggedIn == true and isAdmin != true}">
+                        <a class="btn btn-warning btn-lg" th:href="@{/customer/bookings}">My bookings</a>
+                    </div>
+
+                    <div th:if="${isAdmin == true}">
+                        <a class="btn btn-warning btn-lg" th:href="@{/admin/dashboard}">Go to dashboard</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search -->
+    <div class="container search-box">
+        <div class="card border-0">
+            <div class="card-body">
+                <form th:action="@{/cars}" method="get" class="row g-3 align-items-end">
+
+                    <div class="col-md-5">
+                        <label for="keyword" class="form-label">Brand or model</label>
+                        <input type="text" class="form-control form-control-lg"
+                               id="keyword" name="keyword"
+                               placeholder="e.g. Toyota or Innova">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select class="form-select form-select-lg" id="category" name="category">
+                            <option value="">All</option>
+                            <option th:each="c : ${categories}"
+                                    th:value="${c}" th:text="${c}">SUV</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label for="maxPrice" class="form-label">Max ₹ / day</label>
+                        <input type="number" min="0" step="1"
+                               class="form-control form-control-lg"
+                               id="maxPrice" name="maxPrice">
+                    </div>
+
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="bi bi-search me-1"></i>Search
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <section class="container home-stats">
+        <div class="row text-center g-3">
+
+            <div class="col-4 stat-item">
+                <div class="stat-number" th:text="${availableCars}">0</div>
+                <div class="stat-caption">Cars available</div>
+            </div>
+
+            <div class="col-4 stat-item">
+                <div class="stat-number" th:text="${customerCount}">0</div>
+                <div class="stat-caption">Registered customers</div>
+            </div>
+
+            <div class="col-4 stat-item">
+                <div class="stat-number" th:text="${completedRentals}">0</div>
+                <div class="stat-caption">Completed rentals</div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Cars -->
+    <section class="container home-section">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="section-title mb-1">Our cars</h2>
+                <p class="section-sub mb-0">
+                    Available now, starting from the lowest daily rate.
+                </p>
+            </div>
+
+            <a class="section-link text-decoration-none" th:href="@{/cars}">
+                View all cars &rarr;
+            </a>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-12 text-center text-muted py-5"
+                 th:if="${#lists.isEmpty(cars)}">
+                No cars are available right now. Please check again soon.
+            </div>
+
+            <th:block th:each="car : ${cars}">
+                <div th:replace="~{fragments/car-card :: carCard(${car})}"></div>
+            </th:block>
+        </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="container home-section">
+        <h2 class="section-title text-center mb-4">How it works</h2>
+
+        <div class="row g-4 text-center">
+
+            <div class="col-md-4">
+                <div class="how-card">
+                    <div class="icon-circle">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h5>1. Find a car</h5>
+                    <p>
+                        Search by brand, model, category or price and open the car you like.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="how-card">
+                    <div class="icon-circle">
+                        <i class="bi bi-calendar-check"></i>
+                    </div>
+                    <h5>2. Choose your dates</h5>
+                    <p>
+                        Pick pickup and return times. We check availability and show the price.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="how-card">
+                    <div class="icon-circle">
+                        <i class="bi bi-credit-card"></i>
+                    </div>
+                    <h5>3. Pay and drive</h5>
+                    <p>
+                        Pay online, pay an advance, or pay at pickup. Then collect your car.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Why us -->
+    <section class="container home-section">
+        <h2 class="section-title text-center mb-4">Why rent with us</h2>
+
+        <div class="row g-4">
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card benefit-card border-0">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-shield-check fs-1 text-primary"></i>
+                        <h6 class="mt-2">Live availability</h6>
+                        <p class="small mb-0">
+                            Cars are checked against real pickup and return times,
+                            so no double booking.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card benefit-card border-0">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-receipt fs-1 text-primary"></i>
+                        <h6 class="mt-2">Clear pricing</h6>
+                        <p class="small mb-0">
+                            The rental amount and any additional charges are always shown separately.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card benefit-card border-0">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-cash-coin fs-1 text-primary"></i>
+                        <h6 class="mt-2">Flexible payment</h6>
+                        <p class="small mb-0">
+                            Pay in full, pay 30% in advance, or pay at pickup.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card benefit-card border-0">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-arrow-counterclockwise fs-1 text-primary"></i>
+                        <h6 class="mt-2">Fair cancellation</h6>
+                        <p class="small mb-0">
+                            No cancellation charge more than 48 hours before pickup.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Happy customers -->
+    <section class="reviews-section py-5 mt-5"
+             th:if="${!#lists.isEmpty(happyReviews)}">
+
+        <div class="container">
+            <h2 class="section-title text-center mb-1">Happy customers</h2>
+
+            <p class="section-sub text-center mb-4" th:if="${averageRating != null}">
+                <span th:replace="~{fragments/stars :: stars(${(averageRating + 0.5).intValue()})}">
+                    ★★★★★
+                </span>
+                <span th:text="${#numbers.formatDecimal(averageRating, 1, 1)} + ' average from ' + ${reviewCount} + (${reviewCount == 1} ? ' review' : ' reviews')">
+                    4.5 average
+                </span>
+            </p>
+
+            <div class="row g-4">
+                <div class="col-md-4" th:each="r : ${happyReviews}">
+                    <div class="card review-card border-0">
+                        <div class="card-body d-flex flex-column p-4">
+
+                            <div class="mb-2 fs-5"
+                                 th:replace="~{fragments/stars :: stars(${r.rating})}">
+                                ★★★★★
+                            </div>
+
+                            <p class="review-comment mb-3"
+                               th:text="'“' + ${#strings.abbreviate(r.comment, 160)} + '”'">
+                                Comment
+                            </p>
+
+                            <div class="mt-auto d-flex align-items-center">
+
+                                <div class="review-avatar d-flex align-items-center justify-content-center me-3"
+                                     th:text="${#strings.toUpperCase(#strings.substring(r.customer.user.userName, 0, 1))}">
+                                    A
+                                </div>
+
+                                <div>
+                                    <div class="review-customer"
+                                         th:text="${r.customer.user.userName}">
+                                        Name
+                                    </div>
+
+                                    <div class="review-car"
+                                         th:text="${r.booking.car.brand + ' ' + r.booking.car.model}">
+                                        Brand Model
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Sign-up band -->
+    <section class="container home-section" th:if="${loggedIn != true}">
+        <div class="cta-band text-white text-center">
+            <h3 class="fw-bold">Ready to hit the road?</h3>
+            <p class="mb-4">
+                Create a free account and book your first car in minutes.
+            </p>
+            <a class="btn btn-warning btn-lg" th:href="@{/register}">
+                Create account
+            </a>
+        </div>
+    </section>
+
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+</body>
+</html>

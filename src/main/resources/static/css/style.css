@@ -1,0 +1,100 @@
+.hero {
+    background: linear-gradient(135deg, #1f2937 0%, #1c305c 100%);
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+.car-thumb {
+    width: 80px;
+    height: 55px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.car-card-img {
+    height: 190px;
+    object-fit: cover;
+}
+
+.car-card-noimg {
+    height: 190px;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.car-detail-img {
+    max-height: 380px;
+    object-fit: cover;
+}
+
+body { background-color: #f4f6fa; }
+
+.hero-home { padding: 4.5rem 0 7rem; }
+.search-box { margin-top: -4rem; position: relative; z-index: 2; }
+
+.section-title { font-weight: 700; }
+.section-sub { color: #6c757d; }
+
+.car-card { border: 0; overflow: hidden; transition: transform .2s ease, box-shadow .2s ease; }
+.car-card:hover { transform: translateY(-4px); box-shadow: 0 .75rem 1.5rem rgba(0, 0, 0, .15) !important; }
+
+.icon-circle {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: #e7f0ff; color: #2563eb;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; margin: 0 auto 1rem;
+}
+
+.stat-number { font-size: 2.2rem; font-weight: 700; color: #2563eb; }
+
+.cta-band { background: linear-gradient(135deg, #1f2937 0%, #1c305c 100%); }
+
+.site-footer { margin-top: 3rem; }
+.site-footer a { color: rgba(255, 255, 255, .7); text-decoration: none; }
+.site-footer a:hover { color: #fff; }
+
+.card { border-radius: .75rem; }
+
+.auth-side { background: linear-gradient(135deg, #1f2937 0%, #1c305c 100%); }
+
+.spec-tile {
+    background: #fff;
+    border-radius: .75rem;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
+}
+.spec-tile i { font-size: 1.5rem; color: #2563eb; }
+.spec-label { font-size: .8rem; color: #6c757d; }
+
+.car-detail-img { width: 100%; max-height: 420px; object-fit: cover; display: block; }
+
+body { padding-top: 72px; }
+html { scroll-padding-top: 80px; }
+.gallery-thumb { width: 84px; height: 60px; object-fit: cover; cursor: pointer; opacity: .85; }
+.gallery-thumb:hover { opacity: 1; }
+
+
+/* ---------- Car gallery and catalogue ---------- */
+.gallery-thumb {
+    padding: 0;
+    border: 2px solid transparent;
+    border-radius: .5rem;
+    overflow: hidden;
+    width: 84px;
+    height: 60px;
+    background: none;
+}
+.gallery-thumb:hover { border-color: #2563eb; }
+.gallery-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }

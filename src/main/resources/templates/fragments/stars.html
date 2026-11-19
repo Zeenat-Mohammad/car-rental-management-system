@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<span th:fragment="stars(value)" style="letter-spacing: 1px; white-space: nowrap;"><span
+        th:each="i : ${#numbers.sequence(1, 5)}"
+        th:style="${i <= value} ? 'color:#f5a623' : 'color:#d0d0d0'">&#9733;</span></span>
+</body>
+</html>

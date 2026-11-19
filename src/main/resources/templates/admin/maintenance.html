@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Maintenance')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="admin-page py-4">
+    <div class="container admin-container">
+
+        <div class="page-header">
+            <div>
+                <h2 class="page-title">Car Maintenance</h2>
+                <p class="page-subtitle">Track vehicle repairs, servicing and maintenance status.</p>
+            </div>
+            <a class="btn btn-primary px-4 py-2" th:href="@{/admin/maintenance/new}">
+                + Add Maintenance
+            </a>
+        </div>
+
+        <div class="alert alert-success admin-alert" th:if="${success}" th:text="${success}">Done</div>
+        <div class="alert alert-danger admin-alert" th:if="${error}" th:text="${error}">Error</div>
+
+        <div class="filter-panel">
+            <div class="filter-buttons">
+                <a class="btn"
+                   th:classappend="${selectedStatus == ''} ? ' active-filter' : ' btn-outline-secondary'"
+                   th:href="@{/admin/maintenance}">All</a>
+                <a class="btn"
+                   th:classappend="${selectedStatus == 'ONGOING'} ? ' active-filter' : ' btn-outline-secondary'"
+                   th:href="@{/admin/maintenance(status='ONGOING')}">Ongoing</a>
+                <a class="btn"
+                   th:classappend="${selectedStatus == 'COMPLETED'} ? ' active-filter' : ' btn-outline-secondary'"
+                   th:href="@{/admin/maintenance(status='COMPLETED')}">Completed</a>
+            </div>
+        </div>
+
+        <div class="table-panel">
+            <div class="table-responsive">
+                <table class="table admin-table align-middle">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Car</th>
+                        <th>Issue</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Status</th>
+                        <th>Updated By</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(records)}">
+                        <td colspan="8" class="empty-state">No maintenance records found.</td>
+                    </tr>
+                    <tr th:each="m : ${records}">
+                        <td th:text="${m.maintenanceId}">1</td>
+                        <td>
+                            <div class="primary-cell" th:text="${m.car.brand + ' ' + m.car.model}">Brand Model</div>
+                            <div class="secondary-cell" th:text="${m.car.registrationNumber}">MH12AB1234</div>
+                        </td>
+                        <td th:text="${m.issues}">Issue</td>
+                        <td th:text="${#strings.replace(m.startDateTime, 'T', ' ')}">-</td>
+                        <td>
+                            <span th:if="${m.endDateTime != null}"
+                                  th:text="${#strings.replace(m.endDateTime, 'T', ' ')}">-</span>
+                            <span th:if="${m.endDateTime == null}" class="text-muted">Not set (open)</span>
+                        </td>
+                        <td>
+                            <span class="status-badge"
+                                  th:classappend="${m.status.name() == 'ONGOING'} ? ' status-ongoing' : ' status-completed'"
+                                  th:text="${m.status}">ONGOING</span>
+                        </td>
+                        <td th:text="${m.admin.user.userName}">Admin</td>
+                        <td class="text-end">
+                            <form th:if="${m.status.name() == 'ONGOING'}"
+                                  th:action="@{/admin/maintenance/{id}/complete(id=${m.maintenanceId})}"
+                                  method="post" class="d-inline"
+                                  onsubmit="return confirm('Mark this maintenance as completed? The car will become available again.');">
+                                <button type="submit" class="btn btn-sm btn-outline-success action-btn">
+                                    Mark completed
+                                </button>
+                            </form>
+                            <span th:if="${m.status.name() == 'COMPLETED'}" class="text-muted small">
+                                Completed
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

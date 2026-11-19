@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Booking History')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+<main class="admin-page py-4">
+    <div class="container-fluid admin-container px-3 px-md-4">
+
+        <div class="page-header">
+            <div>
+                <h2 class="page-title">Booking History</h2>
+                <p class="page-subtitle">
+                    Review your completed and cancelled car rentals.
+                </p>
+            </div>
+
+            <a class="btn btn-outline-primary px-4 py-2"
+               th:href="@{/customer/bookings}">
+                My Bookings
+            </a>
+        </div>
+
+        <div class="table-panel">
+            <div class="table-responsive">
+                <table class="table admin-table align-middle">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Car</th>
+                        <th>Pickup</th>
+                        <th>Return</th>
+                        <th>Status</th>
+                        <th class="text-end">Rental</th>
+                        <th class="text-end">Extra Charges</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(bookings)}">
+                        <td colspan="8" class="empty-state">
+                            <div class="fw-semibold mb-1">No booking history yet</div>
+                            <div class="small">Your completed and cancelled bookings will appear here.</div>
+                        </td>
+                    </tr>
+
+                    <tr th:each="b : ${bookings}">
+                        <td class="primary-cell" th:text="${b.bookingId}">1</td>
+
+                        <td class="primary-cell"
+                            th:text="${b.car.brand + ' ' + b.car.model}">
+                            Brand Model
+                        </td>
+
+                        <td th:text="${#strings.replace(b.pickupDateTime, 'T', ' ')}">-</td>
+
+                        <td th:text="${#strings.replace(b.returnDateTime, 'T', ' ')}">-</td>
+
+                        <td>
+                            <span class="booking-status"
+                                  th:classappend="${b.status.name() == 'COMPLETED'} ? ' booking-status-completed' : ' booking-status-cancelled'"
+                                  th:text="${b.status}">COMPLETED</span>
+                        </td>
+
+                        <td class="text-end fw-semibold"
+                            th:text="'₹' + ${#numbers.formatDecimal(b.totalCost, 1, 'COMMA', 2, 'POINT')}">
+                            ₹0.00
+                        </td>
+
+                        <td class="text-end"
+                            th:text="'₹' + ${#numbers.formatDecimal(extras[b.bookingId], 1, 'COMMA', 2, 'POINT')}">
+                            ₹0.00
+                        </td>
+
+                        <td class="text-end text-nowrap history-action-cell">
+                            <a class="btn btn-sm btn-outline-primary action-btn booking-action"
+                               th:href="@{/customer/bookings/{id}(id=${b.bookingId})}">
+                                View
+                            </a>
+
+                            <a class="btn btn-sm btn-outline-warning action-btn booking-action"
+                               th:if="${b.status.name() == 'COMPLETED'}"
+                               th:href="@{/customer/bookings/{id}/review(id=${b.bookingId})}">
+                                Review
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<h4 class="mb-4">Customer reviews</h4>
+<p class="text-muted" th:if="${#lists.isEmpty(reviews)}">No reviews yet. Rent this car and be the first to rate it.</p>
+
+<div class="row g-4" th:if="${!#lists.isEmpty(reviews)}">
+    <!-- Summary -->
+    <div class="col-md-4">
+        <div class="card shadow-sm text-center"><div class="card-body py-4">
+            <div class="display-4 fw-bold" th:text="${#numbers.formatDecimal(averageRating, 1, 1)}">4.5</div>
+            <div class="fs-4" th:replace="~{fragments/stars :: stars(${(averageRating + 0.5).intValue()})}">★★★★★</div>
+            <div class="text-muted small mt-1"
+                 th:text="'Based on ' + ${#lists.size(reviews)} + (${#lists.size(reviews) == 1} ? ' review' : ' reviews')">
+                Based on 3 reviews</div>
+        </div></div>
+    </div>
+    <!-- Reviews -->
+    <div class="col-md-8">
+        <div class="pb-3 mb-3 border-bottom" th:each="review : ${reviews}">
+            <div class="d-flex align-items-center mb-2">
+                <div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center me-3"
+                     style="width:44px;height:44px;"
+                     th:text="${#strings.toUpperCase(#strings.substring(review.customer.user.userName, 0, 1))}">A</div>
+                <div>
+                    <div class="fw-semibold" th:text="${review.customer.user.userName}">Customer</div>
+                    <span th:replace="~{fragments/stars :: stars(${review.rating})}">★★★★★</span>
+                    <span class="text-muted small ms-2" th:text="${review.reviewDate}">2026-11-16</span>
+                </div>
+            </div>
+            <p class="mb-0" th:if="${review.comment != null}" th:text="${review.comment}">Comment</p>
+        </div>
+    </div>
+</div>
